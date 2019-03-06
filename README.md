@@ -6,15 +6,21 @@ The purpose of this repo is so that we can run a code paragraph-by-paragraph and
 
 This parser isn't perfect, but you would be satisfactorily pleased with what you get.
 
+## Installing
+
+```bash
+git clone https://github.com/raibosome/code2notebook.git
+```
+
 ## Running
 
 ```bash
-python py2nb.py your_python_file.py
+python py2nb.py code_to_parse.py
 ```
 
-and you will get a `notebook.ipynb` Jupyter notebook.
+and you will get a `code_to_parse.ipynb` Jupyter notebook. See `python py2nb.py -h` for other arguments.
 
-The `example.py` is a Keras tutorial on building an autoencoder for the MNIST dataset, found [here](https://github.com/keras-team/keras/blob/master/examples/mnist_denoising_autoencoder.py). You can run the example here:
+The `examples/example.py` is a Keras tutorial on building an autoencoder for the MNIST dataset, found [here](https://github.com/keras-team/keras/blob/master/examples/mnist_denoising_autoencoder.py). You can run the example:
 
 ```bash
 python py2nb.py examples/example.py
@@ -22,7 +28,7 @@ python py2nb.py examples/example.py
 
 ## Tests
 
-Tested on macOS 10.14.
+Tested on macOS 10.14 with Python 3.6.
 
 ## How it works
 

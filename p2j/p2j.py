@@ -7,9 +7,16 @@ import os
 import json
 import sys
 
-# Reserved Python keywords
-RESERVED = ['for', 'with', 'class', 'while']
+# Path to directory
 HERE = os.path.abspath(os.path.dirname(__file__))
+
+# Constants
+RESERVED = ['for', 'with', 'class', 'while']  # reserved Python keywords
+TRIPLE_QUOTES = ["\"\"\"", "\'\'\'"]
+FOUR_SPACES = "{:<4}".format("")
+EIGHT_SPACES = "{:<8}".format("")
+TWELVE_SPACES = "{:<12}".format("")
+
 
 def main():
 
@@ -38,7 +45,7 @@ def main():
         print("Target file not specified. Creating a default notebook with name {}.".format(
             target_filename))
     if not overwrite and os.path.isfile(target_filename):
-        print("File {} exists. Add -o flag to overwrite or specify a different name.".format(target_filename))
+        print("File {} exists. Add -o flag to overwrite this file, or specify a different name.".format(target_filename))
         sys.exit(1)
 
     # Read JSON files for .ipynb template
@@ -57,60 +64,64 @@ def main():
 
     # Initialise variables for checks
     is_block_comment = False
-    end_paragraph = True
-    is_running_comment = False
     is_running_code = False
+    is_running_comment = False
     next_is_code = False
     next_is_nothing = False
-    next_is_comment = False
-    is_running_function = False
     next_is_function = False
 
     # Read source code line by line
     for i, line in enumerate(data):
 
-        buffer = ""
-
-        # Check next line
-        try:
-            next_is_code = data[i+1][0] != "#"
-        except:
-            pass
-        try:
-            next_is_comment = data[i+1][0] == "#"
-        except:
-            pass
-        try:
-            next_is_nothing = data[i+1] == ""
-        except:
-            pass
-        try:
-            next_is_function = data[i+1][:4] == "    " or (
-                data[i+1] == "" and data[i+2][:4] == "    ")
-            # print(line)
-            # print(data[i+1][:4] == "")
-        except:
-            pass
-        end_of_code = i == num_lines-1
-
         # Skip if line is empty
         if line == "":
             continue
 
-        # Sub-paragraph is a comment but not a running code
-        if (is_running_comment or (line[0] == "#" and (line[:8] != "# pylint" or line[:7] != "#pylint")) or line[:3] == "'''" or line[-3:] == "'''" or line[:3] == "\"\"\"" or line[-3:] == "\"\"\"") and not is_running_code:
+        buffer = ""
 
-            if line[:3] == "'''" or line[-3:] == "'''" or line[:3] == "\"\"\"" or line[-3:] == "\"\"\"":
+        # Labels for current line
+        contains_triple_quotes = TRIPLE_QUOTES[0] in line or TRIPLE_QUOTES[1] in line
+        is_pylint = line.startswith("# pylint") or line.startswith("#pylint")
+        is_end_of_code = i == num_lines-1
+        starts_with_hash = line.startswith("#")
+
+        # Labels for next line
+        try:
+            next_is_code = not data[i+1].startswith("#")
+        except IndexError:
+            pass
+        try:
+            next_is_nothing = data[i+1] == ""
+        except IndexError:
+            pass
+        try:
+            next_is_function = data[i+1].startswith(FOUR_SPACES) or (
+                next_is_nothing and data[i+2].startswith(FOUR_SPACES))
+        except IndexError:
+            pass
+
+        # Sub-paragraph is a comment but not a running code
+        if not is_running_code and (
+                is_running_comment or (starts_with_hash and not is_pylint) or contains_triple_quotes
+            ):
+
+            if contains_triple_quotes:
                 is_block_comment = not is_block_comment
 
             if is_block_comment:
-                buffer = line.replace("'''", "").replace("\"\"\"", "")
+                buffer = line.replace(
+                    TRIPLE_QUOTES[0], "").replace(
+                        TRIPLE_QUOTES[1], "")
             else:
                 buffer = line[2:]
 
             # Wrap this sub-paragraph as a cell
-            # if next line is code or next line is space or end of code
-            if end_of_code or (next_is_code and not is_block_comment) or (next_is_nothing and not is_block_comment):
+            # If next line is code or next line is space or end of code
+            if is_end_of_code or (
+                next_is_code and not is_block_comment) or (
+                    next_is_nothing and not is_block_comment
+            ):
+
                 arr.append(f"{buffer}")
                 markdown["source"] = arr
                 cells.append(dict(markdown))
@@ -127,7 +138,7 @@ def main():
             # Close this if next line is end of code or next is nothing
             # Don't close if next is still part of a
             # or not next_is_function) or (not next_is_function and next_is_nothing):
-            if (end_of_code or next_is_nothing) and not (next_is_nothing and next_is_function):
+            if (is_end_of_code or next_is_nothing) and not (next_is_nothing and next_is_function):
                 arr.append(f"{buffer}")
                 code["source"] = arr
                 cells.append(dict(code))
@@ -138,9 +149,9 @@ def main():
 
                 # Put another newline character if in a function
                 try:
-                    if data[i+1] == "" and (data[i+2][:5] == "    #" or data[i+2][:9] == "        #"):
+                    if data[i+1] == "" and (data[i+2].startswith("    #") or data[i+2].startswith("        #") or data[i+2].startswith("            #")):
                         buffer = buffer + "\n"
-                except:
+                except IndexError:
                     pass
 
                 arr.append(f"{buffer}")

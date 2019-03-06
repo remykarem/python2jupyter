@@ -9,7 +9,7 @@ This parser isn't perfect, but you would be satisfactorily pleased with what you
 ## Running
 
 ```bash
-python your_python_file.py
+python py2nb.py your_python_file.py
 ```
 
 and you will get a `notebook.ipynb` Jupyter notebook.
@@ -17,7 +17,7 @@ and you will get a `notebook.ipynb` Jupyter notebook.
 The `example.py` is a Keras tutorial on building an autoencoder for the MNIST dataset, found [here](https://github.com/keras-team/keras/blob/master/examples/mnist_denoising_autoencoder.py). You can run the example here:
 
 ```bash
-python example.py
+python py2nb.py examples/example.py
 ```
 
 ## Tests

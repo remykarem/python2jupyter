@@ -1,20 +1,40 @@
 """
 This code translate .py files to .ipynb
 """
-# We only need the json package
+# Standard imports for file handling and JSON files
+import argparse
+import os
+import sys
 import json
-import requests
 
 # Reserved Python keywords
 RESERVED = ['for', 'with', 'class', 'while']
 
-# Read source file
-with open('examples/example3.py', 'r') as file:
-    data = [l.rstrip('\n') for l in file]
+# Get source and target filenames
+parser = argparse.ArgumentParser(description='Parse a file.')
+parser.add_argument('source_filename', help='File to parse')
+parser.add_argument('-t', '--target_filename', help='Target filename')
+parser.add_argument('-o', '--overwrite', action='store_true', help='Flag to overwrite existing target file')
+args = parser.parse_args()
+source_filename = args.source_filename
+target_filename = args.target_filename
+overwrite = args.overwrite
 
-# url = 'https://raw.githubusercontent.com/keras-team/keras/master/examples/mnist_denoising_autoencoder.py'
-# data = requests.get(url).text
-# print(data)
+# Check if source file exists and read
+try:
+    with open(source_filename, 'r') as file:
+        data = [l.rstrip('\n') for l in file]
+except FileNotFoundError:
+    print("Source file not found. Specify a valid source file.")
+    sys.exit(1)
+
+# Check if target file is specified and exists. If not specified, create
+if target_filename is None:
+    target_filename = os.path.splitext(source_filename)[0] + ".ipynb"
+    print("Target file not specified. Creating a default notebook with name {}.".format(target_filename))
+if not overwrite and os.path.isfile(target_filename):
+    print("File {} exists. Add -o flag to overwrite or specify a different name.".format(target_filename))
+    sys.exit(1)
 
 # Read JSON files for .ipynb template
 with open('templates/cell_code.json') as file:
@@ -127,5 +147,6 @@ final["cells"] = cells
 final.update(misc)
 
 # Write JSON to target file
-with open('example.ipynb', 'w') as outfile:
+with open(target_filename, 'w') as outfile:
     json.dump(final, outfile)
+    print("Notebook {} written.".format(target_filename))

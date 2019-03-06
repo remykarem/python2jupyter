@@ -8,7 +8,7 @@ In a nutshell, every paragraph of your code is transformed into a code cell.
 
 This parser isn't perfect, but you would be satisfactorily pleased with what you get.
 
-See an example of a [Python source code](p2j/examples/example3.py) and its [Jupyter notebook](p2j/examples/example3.ipynb) after converting.
+See an example of a [Python source code](p2j/examples/example2.py) and its [Jupyter notebook](p2j/examples/example2.ipynb) after converting.
 
 ## Installing
 

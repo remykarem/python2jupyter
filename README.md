@@ -26,7 +26,11 @@ Tested on macOS 10.14.
 
 ## How it works
 
-Jupyter notebooks are just JSON files. The `py2nb.py` reads the source code line-by-line and determines whether it should be a markdown cell or a code cell, using a rule-based method.
+Jupyter notebooks are just JSON files. The `py2nb.py` reads the source code line-by-line and determines whether it should be a markdown cell or a code cell, using a rule-based method. It also respects the following:
+
+- Blocks of indented code. Comments from within are kept as a code cell). Eg. classes, function definitions and loops
+- Block comments
+- Pylint directives
 
 ## Project Structure
 

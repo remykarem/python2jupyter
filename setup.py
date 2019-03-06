@@ -7,7 +7,7 @@ from setuptools import setup
 # Package meta-data.
 NAME = "p2j"
 VERSION = "1.0.20"
-DESCRIPTION = "Convert Python scripts to Jupyter notebook"
+DESCRIPTION = "p2j: Convert Python scripts to Jupyter notebook with minimal intervention"
 URL = "https://github.com/raibosome/python2jupyter"
 AUTHOR = "Raimi bin Karim"
 AUTHOR_EMAIL = "raimi.bkarim@gmail.com"

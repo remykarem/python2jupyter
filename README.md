@@ -1,12 +1,14 @@
 # p2j - Python to Jupyter Notebook
 
-Converts Python source code to Jupyter notebook.
+Convert your Python source code to Jupyter notebook with zero intervention.
 
-The purpose of this package is so that we can run a code paragraph-by-paragraph and don't have to do that by copying each paragraph of the code into every cell. It's also useful if we want to run our code in Google Colab.
+The purpose of this package is to be able to run a code on Jupyter notebook without having to copy each paragraph of the code into every cell. It's also useful if we want to run our code in Google Colab.
 
 In a nutshell, every paragraph of your code is transformed into a code cell.
 
 This parser isn't perfect, but you would be satisfactorily pleased with what you get.
+
+See an example of a [Python source code](examples/example2.py) and its [Jupyter notebook](examples/example2.ipynb) after converting.
 
 ## Installing
 
@@ -22,11 +24,19 @@ p2j code_to_parse.py
 
 and you will get a `code_to_parse.ipynb` Jupyter notebook. See `p2j -h` for other arguments.
 
-The `examples/example.py` is a Keras tutorial on building an autoencoder for the MNIST dataset, found [here](https://github.com/keras-team/keras/blob/master/examples/mnist_denoising_autoencoder.py). You can run the example:
+To run examples from this repository, first clone this repo
+
+```bash
+git clone https://github.com/raibosome/python2jupyter.git
+```
+
+and after you `cd` into the project, run
 
 ```bash
 p2j examples/example.py
 ```
+
+The `examples/example.py` is a Keras tutorial on building an autoencoder for the MNIST dataset, found [here](https://github.com/keras-team/keras/blob/master/examples/mnist_denoising_autoencoder.py).
 
 ## Tests
 
@@ -36,15 +46,15 @@ Tested on macOS 10.14 with Python 3.6.
 
 Jupyter notebooks are just JSON files. The `py2nb.py` reads the source code line-by-line and determines whether it should be a markdown cell or a code cell, using a rule-based method. It also respects the following:
 
-- Blocks of indented code. Comments from within are kept as a code cell). Eg. classes, function definitions and loops
-- Block comments
-- Pylint directives
+- Blocks of indented code. Comments from within are kept as a code cell. Eg. classes, function definitions and loops
+- Docstrings
+- Pylint directives are converted to code cells
 
 ## Project Structure
 
 ```txt
 ├── p2j             The parser module
-│   ├── __init__.py 
+│   ├── __init__.py
 │   ├── examples    Example codes that you can parse
 │   ├── p2j.py      Main file
 │   └── templates   JSON files needed to build the notebook

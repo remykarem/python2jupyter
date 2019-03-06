@@ -1,34 +1,53 @@
-import pathlib
+#!/usr/bin/env python
+
+import io
+import os
 from setuptools import setup
 
-# The directory containing this file
-HERE = pathlib.Path(__file__).parent
+# Package meta-data.
+NAME = "p2j"
+VERSION = "1.0.20"
+DESCRIPTION = "Convert Python scripts to Jupyter notebook"
+URL = "https://github.com/raibosome/python2jupyter"
+AUTHOR = "Raimi bin Karim"
+AUTHOR_EMAIL = "raimi.bkarim@gmail.com"
+PYTHON_REQUIRES = ">=3.6.0"
 
-# The text of the README file
-README = (HERE / "README.md").read_text()
+# Import the README and use it as the long-description.
+# Note: this will only work if 'README.md' is present in your MANIFEST.in file!
+HERE = os.path.abspath(os.path.dirname(__file__))
+try:
+    with io.open(os.path.join(HERE, 'README.md'), encoding='utf-8') as f:
+        long_description = '\n' + f.read()
+except FileNotFoundError:
+    long_description = DESCRIPTION
 
 # This call to setup() does all the work
 setup(
-    name="p2j",
-    version="0.0.2",
-    description="Convert Python scripts to Jupyter notebook",
-    long_description=README,
+    name=NAME,
+    version=VERSION,
+    description=DESCRIPTION,
+    long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/raibosome/code2notebook",
-    author="Raimi bin Karim",
-    author_email="raimi.bkarim@gmail.com",
+    url=URL,
+    author=AUTHOR,
+    author_email=AUTHOR_EMAIL,
+    python_requires=PYTHON_REQUIRES,
     license="MIT",
-    classifiers=[
-        "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
-    ],
-    packages=["p2j"],
-    include_package_data=True,
-    install_requires=[],
     entry_points={
-        "console_scripts": [
-            "realpython=reader.__main__:main",
-        ]
+        'console_scripts': [
+            'p2j=p2j.p2j:main',
+        ],
     },
+    classifiers=[
+        # Trove classifiers
+        # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6'
+    ],
+    keywords='convert python jupyter notebook script',
+    packages=['p2j'],
+    include_package_data=True
 )

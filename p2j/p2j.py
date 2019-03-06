@@ -23,9 +23,9 @@ def main():
     # Get source and target filenames
     parser = argparse.ArgumentParser(description='Parse a file.')
     parser.add_argument('source_filename', help='File to parse')
-    parser.add_argument('-t', '--target_filename', help='Target filename')
+    parser.add_argument('-t', '--target_filename', help='\nTarget filename\n')
     parser.add_argument('-o', '--overwrite', action='store_true',
-                        help='Flag to overwrite existing target file')
+                        help='Flag to overwrite existing target file\n')
     args = parser.parse_args()
     source_filename = args.source_filename
     target_filename = args.target_filename
@@ -57,10 +57,10 @@ def main():
         misc = json.load(file)
 
     # Initialise variables
-    final = {}
-    cells = []
-    arr = []
-    num_lines = len(data)
+    final = {}              # the dictionary/json of the final notebook
+    cells = []              # an array of all markdown and code cells
+    arr = []                # an array to store individual lines for a cell
+    num_lines = len(data)   # no. of lines of code
 
     # Initialise variables for checks
     is_block_comment = False
@@ -108,36 +108,37 @@ def main():
             if contains_triple_quotes:
                 is_block_comment = not is_block_comment
 
-            if is_block_comment:
-                buffer = line.replace(
-                    TRIPLE_QUOTES[0], "").replace(
-                        TRIPLE_QUOTES[1], "")
-            else:
-                buffer = line[2:]
+            buffer = line.replace(
+                    TRIPLE_QUOTES[0], "\n").replace(
+                        TRIPLE_QUOTES[1], "\n")
+            
+            if not is_block_comment:
+                buffer = buffer[2:]
 
-            # Wrap this sub-paragraph as a cell
-            # If next line is code or next line is space or end of code
+            # Wrap this sub-paragraph as a markdown cell if
+            # next line is end of code OR 
+            # (next line is a code but not a block comment) OR
+            # (next line is nothing but not a block comment)
             if is_end_of_code or (
                 next_is_code and not is_block_comment) or (
                     next_is_nothing and not is_block_comment
             ):
-
                 arr.append(f"{buffer}")
                 markdown["source"] = arr
                 cells.append(dict(markdown))
                 arr = []
                 is_running_comment = False
             else:
-                buffer = buffer + "<br>"
+                buffer = buffer + "<br>\n"
                 arr.append(f"{buffer}")
                 is_running_comment = True
                 continue
         else:  # Sub-paragraph is a comment but not a running code
             buffer = line
 
-            # Close this if next line is end of code or next is nothing
-            # Don't close if next is still part of a
-            # or not next_is_function) or (not next_is_function and next_is_nothing):
+            # Wrap this sub-paragraph as a code cell if
+            # (next line is end of code OR next line is nothing) AND NOT
+            # (next line is nothing AND next line is part of a function)
             if (is_end_of_code or next_is_nothing) and not (next_is_nothing and next_is_function):
                 arr.append(f"{buffer}")
                 code["source"] = arr

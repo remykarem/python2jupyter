@@ -65,13 +65,13 @@ optional arguments:
 
 ## Requirements
 
-- Python 3.5, 3.6
+- Python 3.6
 
 No third party libraries are used.
 
 ## Tests
 
-Tested on macOS 10.14.3 with Python 3.5 and Python 3.6.
+Tested on macOS 10.14.3 with Python 3.6.
 
 ## Code format
 

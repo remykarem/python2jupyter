@@ -2,15 +2,21 @@
 
 Convert your Python source code to Jupyter notebook with zero intervention.
 
-The purpose of this package is to be able to run a code on Jupyter notebook without having to copy each paragraph of the code into every cell. It's also useful if we want to run our code in Google Colab.
-
-In a nutshell, every paragraph of your code is transformed into a code cell.
-
-This parser isn't perfect, but you would be satisfactorily pleased with what you get.
-
 See an example of a [Python source code](p2j/examples/example2.py) and its [Jupyter notebook](p2j/examples/example2.ipynb) after converting.
 
-## Installing
+The purpose of this package is to be able to run a code on Jupyter notebook without having to copy each paragraph of the code into every cell. It's also useful if we want to run our code in Google Colab. This parser isn't perfect, but you would be satisfactorily pleased with what you get.
+
+Contents of this README:
+
+- [Installing](##Installation)
+- [Running](##Running)
+- [Tests](##Tests)
+- [Requirements](##Requirements)
+- [Code format](##Code-Format)
+- [How it works](##How-it-works)
+- [Feedback and pull requests](##Feedback-and-pull-requests)
+
+## Installation
 
 ```bash
 pip install p2j
@@ -19,10 +25,10 @@ pip install p2j
 ## Running
 
 ```bash
-p2j code_to_parse.py
+p2j train.py
 ```
 
-and you will get a `code_to_parse.ipynb` Jupyter notebook. See `p2j -h` for other arguments.
+and you will get a `train.ipynb` Jupyter notebook.
 
 To run examples from this repository, first clone this repo
 
@@ -36,47 +42,155 @@ and after you `cd` into the project, run
 p2j examples/example.py
 ```
 
-The `examples/example.py` is a Keras tutorial on building an autoencoder for the MNIST dataset, found [here](https://github.com/keras-team/keras/blob/master/examples/mnist_denoising_autoencoder.py).
+The `p2j/examples/example.py` is a Keras tutorial on building an autoencoder for the MNIST dataset, found [here](https://github.com/keras-team/keras/blob/master/examples/mnist_denoising_autoencoder.py).
+
+#### Command line usage
+
+To see the command line usage, run `p2j -h` and you will get something like this:
+
+```txt
+p2j [-h] [-t target_filename] [-o] source_filename
+
+required arguments:
+  source_filename        Python script to parse
+
+optional arguments:
+  -h, --help             Show this help message and exit
+  -t, --target_filename  Target filename of Jupyter notebook
+                         If not specified, it will use the filename of
+                         the Python script and append .ipynb
+  -o, --overwrite        Flag whether to overwrite existing target file.
+                         Defaults to false
+```
+
+## Requirements
+
+- Python 3.6
+
+No third party libraries are used.
 
 ## Tests
 
-Tested on macOS 10.14 with Python 3.6.
-
-## How it works
-
-Jupyter notebooks are just JSON files. The `py2nb.py` reads the source code line-by-line and determines whether it should be a markdown cell or a code cell, using a rule-based method. It also respects the following:
-
-- Blocks of indented code. Comments from within are kept as a code cell. Eg. classes, function definitions and loops
-- Docstrings
-- Pylint directives are converted to code cells
-
-## Project Structure
-
-```txt
-├── p2j             The parser module
-│   ├── __init__.py
-│   ├── examples    Example codes that you can parse
-│   ├── p2j.py      Main file
-│   └── templates   JSON files needed to build the notebook
-├── README.md       This file
-├── LICENSE         Licensing
-├── MANIFEST.in     Python packaging-related
-├── build           Python packaging-related
-├── dist            Python packaging-related
-├── p2j.egg-info    Python packaging-related
-└── setup.py        Python packaging-related
-```
+Tested on macOS 10.14.3 with Python 3.6.
 
 ## Code format
 
-There is no specific format that you should follow, but generally the parser assumes a format where your code is paragraphed. Each paragraph has the comments part and/or the code part. The comments will be automatically converted to a markdown cell while the code will be, you guessed it, the code cell.
-
-Some examples of well-documented code (and from which you can test!):
+There is no specific format that you should follow, but generally the parser assumes a format where your code is paragraphed. Check out some examples of well-documented code (and from which you can test!):
 
 - [PyTorch Tutorials](https://pytorch.org/tutorials/beginner/pytorch_with_examples.html)
 - [Keras Examples](https://github.com/keras-team/keras/tree/master/examples)
 - [Scikit Learn Example](https://scikit-learn.org/stable/auto_examples/classification/plot_digits_classification.html#sphx-glr-auto-examples-classification-plot-digits-classification-py)
 
-## Pull requests
+## How it works
 
-Pull requests are very much encouraged!
+Jupyter notebooks are just JSON files, like below. A Python script is read line by line and a dictionary of key-value pairs are generated along the way, using a set of rules. Finally, this dictionary is dumped as a JSON file whose file extension is `.ipynb`.
+
+```json
+{
+    "cells": [
+        {
+            "cell_type": "markdown",
+            "execution_count": null,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "# Import standard functions"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "metadata": {},
+            "source": [
+                "import os"
+            ]
+        },
+    ],
+    "metadata": {},
+    "nbformat": 4,
+    "nbformat_minor": 2
+}
+```
+
+There are 4 basic rules (and exceptions) that I follow to parse the Python script.
+
+### 1. Code or comment
+
+Firstly, any line that starts with a `#` is marked as a comment. So this will be a **markdown cell** in the Jupyter notebook. Everything else that does not start with this character is considered code, so this goes to the **code cell**. There are of course exceptions.
+
+This is a comment
+
+```python
+# Train for 4 epochs
+```
+
+and this is code
+
+```python
+model.train(4)
+```
+
+### 2. Blocks of code and comment
+
+Secondly, code or comment can occur in blocks. A block of comment is several *consecutive* lines of comments that start with `#`. Similarly, several *consecutive* lines of codes that do not start with `#` will be considered as 'a block of code'. This rule is important because we want to ensure that a block of code or comment stays in one cell.
+
+This is a block of comment
+
+```python
+# Load the model and
+# train for 4 epochs and
+# lastly we save the model
+```
+
+and this is a block of code
+
+```python
+model.load()
+model.train(4)
+model.save()
+```
+
+### 3. Paragraph
+
+Thirdly, I assume that everyone writes his/her script in paragraphs, where each paragraph represents an idea. In a paragraph, there can be code or comments or both.
+
+The following are 5 examples of paragraphs.
+
+```python
+# Evaluate the model
+model.evaluate()
+
+# Run the model for a while.
+# Then we hide the model.
+run()
+hide()
+
+print(type(data))
+
+# This is considered as a paragraph too
+# It has 2 lines of comments
+
+# The data that we are interested in is made of 8x8 images of digits.
+# Let's have a look at the first 4 images, which is of course
+# stored in the `images` attribute of the dataset.  
+images = list(zip(mnist.images))
+```
+
+### 4. Indentation
+
+Any line of code or comment that is indented by a multiple of 4 spaces is considered code, and will stay in the same code cell as the previous non-empty line. This ensures that function and class definitions, loops and multi-line code stay in one cell.
+
+### 5. Exceptions
+
+Now we handle the exceptions to the above-mentioned rules.
+
+- Docstrings are considered as **markdown cells**, only if they are not indented.
+
+- Lines that begin with `#pylint` or `# pylint` are Pylint directives and are kept as **code cells**.
+
+- Shebang is considered as a **code cell**, eg. `#!/usr/bin/env python3`.
+
+- Encodings like `# -*- coding: utf-8 -*-` are also considered as **code cells**.
+
+## Feedback and pull requests
+
+If you do like this, star me maybe? Pull requests are very much encouraged! Slide into my DM with suggestions too!

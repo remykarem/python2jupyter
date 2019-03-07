@@ -21,11 +21,17 @@ TWELVE_SPACES = "{:<12}".format("")
 def main():
 
     # Get source and target filenames
-    parser = argparse.ArgumentParser(description='Parse a file.')
-    parser.add_argument('source_filename', help='File to parse')
-    parser.add_argument('-t', '--target_filename', help='\nTarget filename\n')
-    parser.add_argument('-o', '--overwrite', action='store_true',
-                        help='Flag to overwrite existing target file\n')
+    parser = argparse.ArgumentParser(
+        description='Convert a Python script to Jupyter notebook')
+    parser.add_argument('source_filename',
+                        help='Python script to parse')
+    parser.add_argument('-t',
+                        '--target_filename',
+                        help="""Target filename of Jupyter notebook. If not specified, it will use the filename of the Python script and append .ipynb""")
+    parser.add_argument('-o',
+                        '--overwrite',
+                        action='store_true',
+                        help='Flag whether to overwrite existing target file. Defaults to false')
     args = parser.parse_args()
     source_filename = args.source_filename
     target_filename = args.target_filename
@@ -81,7 +87,10 @@ def main():
 
         # Labels for current line
         contains_triple_quotes = TRIPLE_QUOTES[0] in line or TRIPLE_QUOTES[1] in line
-        is_pylint = line.startswith("# pylint") or line.startswith("#pylint")
+        is_code = line.startswith("# pylint") or line.startswith(
+            "#pylint") or line.startswith("#!") or line.startswith(
+                "# -*- coding") or line.startswith("# coding=") or line.startswith(
+                    "# This Python file uses the following encoding:")
         is_end_of_code = i == num_lines-1
         starts_with_hash = line.startswith("#")
 
@@ -102,35 +111,36 @@ def main():
 
         # Sub-paragraph is a comment but not a running code
         if not is_running_code and (
-                is_running_comment or (starts_with_hash and not is_pylint) or contains_triple_quotes
-            ):
+            is_running_comment or (
+                starts_with_hash and not is_code) or contains_triple_quotes
+        ):
 
             if contains_triple_quotes:
                 is_block_comment = not is_block_comment
 
             buffer = line.replace(
-                    TRIPLE_QUOTES[0], "\n").replace(
-                        TRIPLE_QUOTES[1], "\n")
-            
+                TRIPLE_QUOTES[0], "\n").replace(
+                TRIPLE_QUOTES[1], "\n")
+
             if not is_block_comment:
                 buffer = buffer[2:]
 
             # Wrap this sub-paragraph as a markdown cell if
-            # next line is end of code OR 
+            # next line is end of code OR
             # (next line is a code but not a block comment) OR
             # (next line is nothing but not a block comment)
             if is_end_of_code or (
                 next_is_code and not is_block_comment) or (
                     next_is_nothing and not is_block_comment
             ):
-                arr.append(f"{buffer}")
+                arr.append("{}".format(buffer))
                 markdown["source"] = arr
                 cells.append(dict(markdown))
                 arr = []
                 is_running_comment = False
             else:
                 buffer = buffer + "<br>\n"
-                arr.append(f"{buffer}")
+                arr.append("{}".format(buffer))
                 is_running_comment = True
                 continue
         else:  # Sub-paragraph is a comment but not a running code
@@ -140,7 +150,7 @@ def main():
             # (next line is end of code OR next line is nothing) AND NOT
             # (next line is nothing AND next line is part of a function)
             if (is_end_of_code or next_is_nothing) and not (next_is_nothing and next_is_function):
-                arr.append(f"{buffer}")
+                arr.append("{}".format(buffer))
                 code["source"] = arr
                 cells.append(dict(code))
                 arr = []
@@ -155,7 +165,7 @@ def main():
                 except IndexError:
                     pass
 
-                arr.append(f"{buffer}")
+                arr.append("{}".format(buffer))
                 is_running_code = True
                 continue
 
@@ -170,5 +180,4 @@ def main():
 
 
 if __name__ == "__main__":
-    print("Convert a Python script to Jupyter notebook")
     main()

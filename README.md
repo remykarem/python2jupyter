@@ -39,7 +39,7 @@ and you will get a `train.ipynb` Jupyter notebook.
 Specify the target filename with a `-t`.
 
 ```bash
-p2j <$(curl https://raw.githubusercontent.com/keras-team/keras/master/examples/mnist_cnn.py) -t myfile.ipynb
+p2j <(curl https://raw.githubusercontent.com/keras-team/keras/master/examples/mnist_cnn.py) -t myfile.ipynb
 ```
 
 ### Converting an in-line Python script

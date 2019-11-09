@@ -35,7 +35,7 @@ The purpose of this package is to be able to run a code on Jupyter notebook with
 Contents of this README:
 
 - [Installing](##Installation)
-- [Running](##Running)
+- [Converting](##Converting)
 - [Tests](##Tests)
 - [Requirements](##Requirements)
 - [Code format](##Code-Format)
@@ -48,13 +48,33 @@ Contents of this README:
 pip install p2j
 ```
 
-## Running
+## Converting
+
+There are 3 main ways you can get your Jupyter notebook:
+
+### Converting a Python script
 
 ```bash
 p2j train.py
 ```
 
 and you will get a `train.ipynb` Jupyter notebook.
+
+### Converting a script from the Internet (you need to have curl)
+
+Specify the target filename with a `-t`.
+
+```bash
+p2j <(curl https://raw.githubusercontent.com/keras-team/keras/master/examples/mnist_cnn.py) -t myfile.ipynb
+```
+
+### Converting an in-line Python script
+
+```bash
+p2j <(echo "# boilerplate code \n import os") -t myfile2.ipynb
+```
+
+Note:
 
 To run examples from this repository, first clone this repo
 

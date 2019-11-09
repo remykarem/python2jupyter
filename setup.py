@@ -6,7 +6,7 @@ from setuptools import setup
 
 # Package meta-data.
 NAME = "p2j"
-VERSION = "1.2.1"
+VERSION = "1.2.2"
 DESCRIPTION = "p2j: Convert Python scripts to Jupyter notebook with minimal intervention"
 URL = "https://github.com/raibosome/python2jupyter"
 AUTHOR = "Raimi bin Karim"
@@ -18,16 +18,16 @@ PYTHON_REQUIRES = ">=3.6.0"
 HERE = os.path.abspath(os.path.dirname(__file__))
 try:
     with io.open(os.path.join(HERE, 'README.md'), encoding='utf-8') as f:
-        long_description = '\n' + f.read()
+        LONG_DESCRIPTION = '\n' + f.read()
 except FileNotFoundError:
-    long_description = DESCRIPTION
+    LONG_DESCRIPTION = DESCRIPTION
 
 # This call to setup() does all the work
 setup(
     name=NAME,
     version=VERSION,
     description=DESCRIPTION,
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     url=URL,
     author=AUTHOR,

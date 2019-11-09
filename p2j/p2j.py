@@ -1,5 +1,5 @@
 """
-This code translate .py files to .ipynb
+This code translates .py files to .ipynb
 """
 # Standard imports for file handling and JSON files
 import argparse

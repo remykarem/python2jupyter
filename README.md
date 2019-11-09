@@ -1,8 +1,34 @@
-# p2j - Python to Jupyter Notebook [![PyPI version](https://badge.fury.io/py/p2j.svg)](https://badge.fury.io/py/p2j)
+# p2j - Python to Jupyter Notebook Parser [![PyPI version](https://badge.fury.io/py/p2j.svg)](https://badge.fury.io/py/p2j)
 
-Convert your Python source code to Jupyter notebook with zero intervention.
+Convert your Python source code to Jupyter notebook with **zero intervention**.
 
-See an example of a [Python source code](p2j/examples/example2.py) and its [Jupyter notebook](p2j/examples/example2.ipynb) after converting.
+Here is an example.
+
+```python
+# Evaluate the model
+model.evaluate()
+
+# Run the model for a while.
+# Then we hide the model.
+run()
+hide()
+
+print(type(data))
+
+# This is considered as a paragraph too
+# It has 2 lines of comments
+
+# The data that we are interested in is made of 8x8 images of digits.
+# Let's have a look at the first 4 images, which is of course
+# stored in the `images` attribute of the dataset.  
+images = list(zip(mnist.images))
+```
+
+which translates to the following:
+
+![example](screenshot.png)
+
+Here's another example of a [Python source code](p2j/examples/example2.py) and its [Jupyter notebook](p2j/examples/example2.ipynb) after converting.
 
 The purpose of this package is to be able to run a code on Jupyter notebook without having to copy each paragraph of the code into every cell. It's also useful if we want to run our code in Google Colab. This parser isn't perfect, but you would be satisfactorily pleased with what you get.
 
@@ -65,7 +91,7 @@ optional arguments:
 
 ## Requirements
 
-- Python 3.6
+- Python >= 3.6
 
 No third party libraries are used.
 
@@ -174,6 +200,10 @@ print(type(data))
 # stored in the `images` attribute of the dataset.  
 images = list(zip(mnist.images))
 ```
+
+which translates to the following:
+
+![example](screenshot.png)
 
 ### 4. Indentation
 

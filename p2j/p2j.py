@@ -165,7 +165,7 @@ def p2j(source_filename, target_filename, overwrite):
         print("Notebook {} written.".format(target_filename))
 
 
-def j2p(source_filename, target_filename, overwrite, with_markdown=False):
+def j2p(source_filename, target_filename, overwrite):
     """Convert Jupyter notebooks to Python scripts
 
     Args:
@@ -192,10 +192,12 @@ def j2p(source_filename, target_filename, overwrite, with_markdown=False):
         raise FileExistsError("File {} exists. ".format(target_filename) +
                               "Add -o flag to overwrite this file, or specify a different name.")
 
-    final = [cell["source"][0].replace("\n", "\n# ")
-             if cell["cell_type"] == "markdown" and with_markdown else cell["source"][0]
+    print('test')
+    final = [''.join(["# " + line.lstrip() for line in cell["source"] if not line.strip() == ""])
+             if cell["cell_type"] == "markdown" else ''.join(cell["source"])
              for cell in myfile['cells']]
     final = '\n\n'.join(final)
+    final = final.replace("<br>", "")
 
     with open(target_filename, "a") as outfile:
         outfile.write(final)
@@ -213,10 +215,6 @@ def main():
                         '--reverse',
                         action='store_true',
                         help="To convert Jupyter to Python scripto")
-    parser.add_argument('-m',
-                        '--markdown',
-                        action='store_true',
-                        help="To convert Jupyter to Python script with markdown")
     parser.add_argument('-t',
                         '--target_filename',
                         help="Target filename of Jupyter notebook. If not specified, " +
@@ -230,8 +228,7 @@ def main():
     if args.reverse:
         j2p(source_filename=args.source_filename,
             target_filename=args.target_filename,
-            overwrite=args.overwrite,
-            with_markdown=args.markdown)
+            overwrite=args.overwrite)
     else:
         p2j(source_filename=args.source_filename,
             target_filename=args.target_filename,

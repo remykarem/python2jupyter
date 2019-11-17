@@ -25,6 +25,9 @@ def p2j(source_filename, target_filename, overwrite):
         overwrite (bool): Whether to overwrite an existing Jupyter notebook.
     """
 
+    target_filename = _check_files(
+        source_filename, target_filename, overwrite, conversion="p2j")
+
     # Check if source file exists and read
     try:
         with open(source_filename, 'r') as infile:
@@ -166,6 +169,9 @@ def j2p(source_filename, target_filename, overwrite):
         with_markdown (bool, optional): Whether to include markdown. Defaults to False.
     """
 
+    target_filename = _check_files(
+        source_filename, target_filename, overwrite, conversion="j2p")
+
     # Check if source file exists and read
     try:
         with open(source_filename, 'r') as infile:
@@ -193,61 +199,64 @@ def main():
         description='Convert a Python script to Jupyter notebook and vice versa')
     parser.add_argument('source_filename',
                         help='Python script to parse')
-    parser.add_argument('-r',
-                        '--reverse',
+    parser.add_argument('-r', '--reverse',
                         action='store_true',
                         help="To convert Jupyter to Python scripto")
-    parser.add_argument('-t',
-                        '--target_filename',
+    parser.add_argument('-t', '--target_filename',
                         help="Target filename of Jupyter notebook. If not specified, " +
                         "it will use the filename of the Python script and append .ipynb")
-    parser.add_argument('-o',
-                        '--overwrite',
+    parser.add_argument('-o', '--overwrite',
                         action='store_true',
                         help='Flag whether to overwrite existing target file. Defaults to false')
     args = parser.parse_args()
 
-    file_ext = os.path.splitext(args.source_filename)[-1]
-
-
     if args.reverse:
-        if file_ext != ".ipynb":
-            print("Wrong file type specified. Expected .ipynb extension " +
-                  "but got {} instead.".format(file_ext))
-            sys.exit(1)
-
-        # Check if target file is specified and exists. If not specified, create
-        if args.target_filename is None:
-            target_filename = os.path.splitext(args.source_filename)[0] + ".py"
-        if not args.overwrite and os.path.isfile(args.target_filename):
-            # FileExistsError
-            print("File {} exists. ".format(target_filename) +
-                "Add -o flag to overwrite this file, " +
-                "or specify a different target filename using -t.")
-            sys.exit(1)
-
         j2p(source_filename=args.source_filename,
             target_filename=args.target_filename,
             overwrite=args.overwrite)
     else:
-        if file_ext != ".py":
-            print("Wrong file type specified. Expected .ipynb extension " +
-                  "but got {} instead.".format(file_ext))
-            sys.exit(1)
-
-        # Check if target file is specified and exists. If not specified, create
-        if args.target_filename is None:
-            target_filename = os.path.splitext(args.source_filename)[0] + ".ipynb"
-        if not args.overwrite and os.path.isfile(args.target_filename):
-            # FileExistsError
-            print("File {} exists. ".format(target_filename) +
-                "Add -o flag to overwrite this file, " +
-                "or specify a different target filename using -t.")
-            sys.exit(1)
-
         p2j(source_filename=args.source_filename,
             target_filename=args.target_filename,
             overwrite=args.overwrite)
+
+
+def _check_files(source_file, target_file, overwrite, conversion):
+    """File path checking
+
+    Check if
+    1) Name of source file is valid.
+    2) Target file already exists. If not, create.
+
+    Does not check if source file exists. That will be done
+    together when opening the file.
+    """
+
+    if conversion == "p2j":
+        expected_src_file_ext = ".py"
+        expected_tgt_file_ext = ".ipynb"
+    else:
+        expected_src_file_ext = ".ipynb"
+        expected_tgt_file_ext = ".py"
+
+    file_base = os.path.splitext(source_file)[0]
+    file_ext = os.path.splitext(source_file)[-1]
+
+    if file_ext != expected_src_file_ext:
+        print("Wrong file type specified. Expected {} ".format(expected_src_file_ext) +
+              "extension but got {} instead.".format(file_ext))
+        sys.exit(1)
+
+    # Check if target file is specified and exists. If not specified, create
+    if target_file is None:
+        target_file = file_base + expected_tgt_file_ext
+    if not overwrite and os.path.isfile(target_file):
+        # FileExistsError
+        print("File {} exists. ".format(target_file) +
+              "Add -o flag to overwrite this file, " +
+              "or specify a different target filename using -t.")
+        sys.exit(1)
+
+    return target_file
 
 
 if __name__ == "__main__":

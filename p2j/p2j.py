@@ -1,5 +1,5 @@
 """
-This code translates .py files to .ipynb
+This module translates .py files to .ipynb and vice versa
 """
 import argparse
 import os
@@ -16,12 +16,21 @@ EIGHT_SPACES = "{:<8}".format("")
 TWELVE_SPACES = "{:<12}".format("")
 
 
-def p2j_(source_filename, target_filename, overwrite):
+def p2j(source_filename, target_filename, overwrite):
+    """Convert Python scripts to Jupyter notebooks.
+
+    Args:
+        source_filename (str): Path to Python script.
+        target_filename (str): Path to name of Jupyter notebook. Optional.
+        overwrite (bool): Whether to overwrite an existing Jupyter notebook.
+    """
 
     # Check if source file exists and read
+    if os.path.splitext(source_filename)[-1] != ".py":
+        raise FileTypeError
     try:
-        with open(source_filename, 'r') as file:
-            data = [l.rstrip('\n') for l in file]
+        with open(source_filename, 'r') as infile:
+            data = [l.rstrip('\n') for l in infile]
     except FileNotFoundError:
         print("Source file not found. Specify a valid source file.")
         sys.exit(1)
@@ -30,17 +39,16 @@ def p2j_(source_filename, target_filename, overwrite):
     if target_filename is None:
         target_filename = os.path.splitext(source_filename)[0] + ".ipynb"
     if not overwrite and os.path.isfile(target_filename):
-        print("File {} exists. Add -o flag to overwrite this file,".format(target_filename) +
-              " or specify a different name.")
-        sys.exit(1)
+        raise FileExistsError("File {} exists.".format(target_filename) +
+                              "Add -o flag to overwrite this file, or specify a different name.")
 
     # Read JSON files for .ipynb template
     with open(HERE + '/templates/cell_code.json') as file:
-        code = json.load(file)
+        CODE = json.load(file)
     with open(HERE + '/templates/cell_markdown.json') as file:
-        markdown = json.load(file)
+        MARKDOWN = json.load(file)
     with open(HERE + '/templates/metadata.json') as file:
-        misc = json.load(file)
+        MISC = json.load(file)
 
     # Initialise variables
     final = {}              # the dictionary/json of the final notebook
@@ -90,17 +98,15 @@ def p2j_(source_filename, target_filename, overwrite):
             pass
 
         # Sub-paragraph is a comment but not a running code
-        if not is_running_code and (
-            is_running_comment or (
-                starts_with_hash and not is_code) or contains_triple_quotes
-        ):
+        if not is_running_code and (is_running_comment or
+                                    (starts_with_hash and not is_code) or
+                                    contains_triple_quotes):
 
             if contains_triple_quotes:
                 is_block_comment = not is_block_comment
 
-            buffer = line.replace(
-                TRIPLE_QUOTES[0], "\n").replace(
-                TRIPLE_QUOTES[1], "\n")
+            buffer = line.replace(TRIPLE_QUOTES[0], "\n").\
+                replace(TRIPLE_QUOTES[1], "\n")
 
             if not is_block_comment:
                 buffer = buffer[2:]
@@ -109,13 +115,11 @@ def p2j_(source_filename, target_filename, overwrite):
             # next line is end of code OR
             # (next line is a code but not a block comment) OR
             # (next line is nothing but not a block comment)
-            if is_end_of_code or (
-                next_is_code and not is_block_comment) or (
-                    next_is_nothing and not is_block_comment
-            ):
+            if is_end_of_code or (next_is_code and not is_block_comment) or \
+                    (next_is_nothing and not is_block_comment):
                 arr.append("{}".format(buffer))
-                markdown["source"] = arr
-                cells.append(dict(markdown))
+                MARKDOWN["source"] = arr
+                cells.append(dict(MARKDOWN))
                 arr = []
                 is_running_comment = False
             else:
@@ -131,8 +135,8 @@ def p2j_(source_filename, target_filename, overwrite):
             # (next line is nothing AND next line is part of a function)
             if (is_end_of_code or next_is_nothing) and not (next_is_nothing and next_is_function):
                 arr.append("{}".format(buffer))
-                code["source"] = arr
-                cells.append(dict(code))
+                CODE["source"] = arr
+                cells.append(dict(CODE))
                 arr = []
                 is_running_code = False
             else:
@@ -140,7 +144,9 @@ def p2j_(source_filename, target_filename, overwrite):
 
                 # Put another newline character if in a function
                 try:
-                    if data[i+1] == "" and (data[i+2].startswith("    #") or data[i+2].startswith("        #") or data[i+2].startswith("            #")):
+                    if data[i+1] == "" and (data[i+2].startswith("    #") or
+                                            data[i+2].startswith("        #") or
+                                            data[i+2].startswith("            #")):
                         buffer = buffer + "\n"
                 except IndexError:
                     pass
@@ -151,7 +157,7 @@ def p2j_(source_filename, target_filename, overwrite):
 
     # Finalise the contents of notebook
     final["cells"] = cells
-    final.update(misc)
+    final.update(MISC)
 
     # Write JSON to target file
     with open(target_filename, 'w') as outfile:
@@ -159,9 +165,19 @@ def p2j_(source_filename, target_filename, overwrite):
         print("Notebook {} written.".format(target_filename))
 
 
-def j2p_(source_filename, target_filename, overwrite, with_markdown=False):
+def j2p(source_filename, target_filename, overwrite, with_markdown=False):
+    """Convert Jupyter notebooks to Python scripts
+
+    Args:
+        source_filename (str): Path to Jupyter notebook.
+        target_filename (str): Path to name of Python script. Optional.
+        overwrite (bool): Whether to overwrite an existing Python script.
+        with_markdown (bool, optional): Whether to include markdown. Defaults to False.
+    """
 
     # Check if source file exists and read
+    if os.path.splitext(source_filename)[-1] != ".ipynb":
+        raise FileTypeError
     try:
         with open(source_filename, 'r') as infile:
             myfile = json.load(infile)
@@ -173,18 +189,17 @@ def j2p_(source_filename, target_filename, overwrite, with_markdown=False):
     if target_filename is None:
         target_filename = os.path.splitext(source_filename)[0] + ".py"
     if not overwrite and os.path.isfile(target_filename):
-        print("File {} exists. Add -o flag to overwrite this file,".format(target_filename) +
-              " or specify a different name.")
-        sys.exit(1)
+        raise FileExistsError("File {} exists. ".format(target_filename) +
+                              "Add -o flag to overwrite this file, or specify a different name.")
 
-    final = [cell["source"][0].replace("\n","\n# ")
+    final = [cell["source"][0].replace("\n", "\n# ")
              if cell["cell_type"] == "markdown" and with_markdown else cell["source"][0]
-             for cell in myfile['cells']
-             ]
+             for cell in myfile['cells']]
     final = '\n\n'.join(final)
 
     with open(target_filename, "a") as outfile:
         outfile.write(final)
+        print("Python script {} written.".format(target_filename))
 
 
 def main():
@@ -192,19 +207,20 @@ def main():
     # Get source and target filenames
     parser = argparse.ArgumentParser(
         description='Convert a Python script to Jupyter notebook')
+    parser.add_argument('source_filename',
+                        help='Python script to parse')
     parser.add_argument('-r',
                         '--reverse',
                         action='store_true',
-                        help="To convert Jupyter to Python script")
+                        help="To convert Jupyter to Python scripto")
     parser.add_argument('-m',
                         '--markdown',
                         action='store_true',
                         help="To convert Jupyter to Python script with markdown")
-    parser.add_argument('source_filename',
-                        help='Python script to parse')
     parser.add_argument('-t',
                         '--target_filename',
-                        help="""Target filename of Jupyter notebook. If not specified, it will use the filename of the Python script and append .ipynb""")
+                        help="Target filename of Jupyter notebook. If not specified, " +
+                        "it will use the filename of the Python script and append .ipynb")
     parser.add_argument('-o',
                         '--overwrite',
                         action='store_true',
@@ -212,9 +228,19 @@ def main():
     args = parser.parse_args()
 
     if args.reverse:
-        j2p_(args.markdown, args.source_filename, args.target_filename, args.overwrite)
+        j2p(source_filename=args.source_filename,
+            target_filename=args.target_filename,
+            overwrite=args.overwrite,
+            with_markdown=args.markdown)
     else:
-        p2j_(args.source_filename, args.target_filename, args.overwrite)
+        p2j(source_filename=args.source_filename,
+            target_filename=args.target_filename,
+            overwrite=args.overwrite)
+
+
+class FileTypeError(Exception):
+    def __str__(self):
+        return "Wrong file type"
 
 
 if __name__ == "__main__":

@@ -39,7 +39,7 @@ def p2j(source_filename, target_filename, overwrite):
     if target_filename is None:
         target_filename = os.path.splitext(source_filename)[0] + ".ipynb"
     if not overwrite and os.path.isfile(target_filename):
-        raise FileExistsError("File {} exists.".format(target_filename) +
+        raise FileExistsError("File {} exists. ".format(target_filename) +
                               "Add -o flag to overwrite this file, or specify a different name.")
 
     # Read JSON files for .ipynb template

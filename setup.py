@@ -5,13 +5,8 @@ import os
 from setuptools import setup
 
 # Package meta-data.
-NAME = "p2j"
-VERSION = "1.2.2"
+VERSION = "1.3.0b1"
 DESCRIPTION = "p2j: Convert Python scripts to Jupyter notebook with minimal intervention"
-URL = "https://github.com/raibosome/python2jupyter"
-AUTHOR = "Raimi bin Karim"
-AUTHOR_EMAIL = "raimi.bkarim@gmail.com"
-PYTHON_REQUIRES = ">=3.6.0"
 
 # Import the README and use it as the long-description.
 # Note: this will only work if 'README.md' is present in your MANIFEST.in file!
@@ -24,15 +19,15 @@ except FileNotFoundError:
 
 # This call to setup() does all the work
 setup(
-    name=NAME,
+    name="p2j",
     version=VERSION,
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
-    url=URL,
-    author=AUTHOR,
-    author_email=AUTHOR_EMAIL,
-    python_requires=PYTHON_REQUIRES,
+    url="https://github.com/raibosome/python2jupyter",
+    author="Raimi bin Karim",
+    author_email="raimi.bkarim@gmail.com",
+    python_requires=">=3.6.0",
     license="MIT",
     entry_points={
         'console_scripts': [

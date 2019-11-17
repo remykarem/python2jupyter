@@ -1,7 +1,6 @@
 """
 This code translates .py files to .ipynb
 """
-# Standard imports for file handling and JSON files
 import argparse
 import os
 import json
@@ -10,7 +9,6 @@ import sys
 # Path to directory
 HERE = os.path.abspath(os.path.dirname(__file__))
 
-# Constants
 RESERVED = ['for', 'with', 'class', 'while']  # reserved Python keywords
 TRIPLE_QUOTES = ["\"\"\"", "\'\'\'"]
 FOUR_SPACES = "{:<4}".format("")
@@ -18,24 +16,7 @@ EIGHT_SPACES = "{:<8}".format("")
 TWELVE_SPACES = "{:<12}".format("")
 
 
-def main():
-
-    # Get source and target filenames
-    parser = argparse.ArgumentParser(
-        description='Convert a Python script to Jupyter notebook')
-    parser.add_argument('source_filename',
-                        help='Python script to parse')
-    parser.add_argument('-t',
-                        '--target_filename',
-                        help="""Target filename of Jupyter notebook. If not specified, it will use the filename of the Python script and append .ipynb""")
-    parser.add_argument('-o',
-                        '--overwrite',
-                        action='store_true',
-                        help='Flag whether to overwrite existing target file. Defaults to false')
-    args = parser.parse_args()
-    source_filename = args.source_filename
-    target_filename = args.target_filename
-    overwrite = args.overwrite
+def p2j_(source_filename, target_filename, overwrite):
 
     # Check if source file exists and read
     try:
@@ -48,10 +29,9 @@ def main():
     # Check if target file is specified and exists. If not specified, create
     if target_filename is None:
         target_filename = os.path.splitext(source_filename)[0] + ".ipynb"
-        print("Target file not specified. Creating a default notebook with name {}.".format(
-            target_filename))
     if not overwrite and os.path.isfile(target_filename):
-        print("File {} exists. Add -o flag to overwrite this file, or specify a different name.".format(target_filename))
+        print("File {} exists. Add -o flag to overwrite this file,".format(target_filename) +
+              " or specify a different name.")
         sys.exit(1)
 
     # Read JSON files for .ipynb template
@@ -177,6 +157,64 @@ def main():
     with open(target_filename, 'w') as outfile:
         json.dump(final, outfile)
         print("Notebook {} written.".format(target_filename))
+
+
+def j2p_(source_filename, target_filename, overwrite, with_markdown=False):
+
+    # Check if source file exists and read
+    try:
+        with open(source_filename, 'r') as infile:
+            myfile = json.load(infile)
+    except FileNotFoundError:
+        print("Source file not found. Specify a valid source file.")
+        sys.exit(1)
+
+    # Check if target file is specified and exists. If not specified, create
+    if target_filename is None:
+        target_filename = os.path.splitext(source_filename)[0] + ".py"
+    if not overwrite and os.path.isfile(target_filename):
+        print("File {} exists. Add -o flag to overwrite this file,".format(target_filename) +
+              " or specify a different name.")
+        sys.exit(1)
+
+    final = [cell["source"][0].replace("\n","\n# ")
+             if cell["cell_type"] == "markdown" and with_markdown else cell["source"][0]
+             for cell in myfile['cells']
+             ]
+    final = '\n\n'.join(final)
+
+    with open(target_filename, "a") as outfile:
+        outfile.write(final)
+
+
+def main():
+
+    # Get source and target filenames
+    parser = argparse.ArgumentParser(
+        description='Convert a Python script to Jupyter notebook')
+    parser.add_argument('-r',
+                        '--reverse',
+                        action='store_true',
+                        help="To convert Jupyter to Python script")
+    parser.add_argument('-m',
+                        '--markdown',
+                        action='store_true',
+                        help="To convert Jupyter to Python script with markdown")
+    parser.add_argument('source_filename',
+                        help='Python script to parse')
+    parser.add_argument('-t',
+                        '--target_filename',
+                        help="""Target filename of Jupyter notebook. If not specified, it will use the filename of the Python script and append .ipynb""")
+    parser.add_argument('-o',
+                        '--overwrite',
+                        action='store_true',
+                        help='Flag whether to overwrite existing target file. Defaults to false')
+    args = parser.parse_args()
+
+    if args.reverse:
+        j2p_(args.markdown, args.source_filename, args.target_filename, args.overwrite)
+    else:
+        p2j_(args.source_filename, args.target_filename, args.overwrite)
 
 
 if __name__ == "__main__":

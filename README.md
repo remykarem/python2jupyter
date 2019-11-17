@@ -34,7 +34,7 @@ The purpose of this package is to be able to run a code on Jupyter notebook with
 
 Contents of this README:
 
-- [Installing](##Installation)
+- (Installing)(##Installation)
 - [Converting](##Converting)
 - [Tests](##Tests)
 - [Requirements](##Requirements)
@@ -103,18 +103,22 @@ The `p2j/examples/example.py` is a Keras tutorial on building an autoencoder for
 To see the command line usage, run `p2j -h` and you will get something like this:
 
 ```txt
-p2j [-h] [-t target_filename] [-o] source_filename
+usage: p2j [-h] [-r] [-t TARGET_FILENAME] [-o] source_filename
 
-required arguments:
-  source_filename        Python script to parse
+Convert a Python script to Jupyter notebook
+
+positional arguments:
+  source_filename       Python script to parse
 
 optional arguments:
-  -h, --help             Show this help message and exit
-  -t, --target_filename  Target filename of Jupyter notebook
-                         If not specified, it will use the filename of
-                         the Python script and append .ipynb
-  -o, --overwrite        Flag whether to overwrite existing target file.
-                         Defaults to false
+  -h, --help            show this help message and exit
+  -r, --reverse         To convert Jupyter to Python script
+  -t TARGET_FILENAME, --target_filename TARGET_FILENAME
+                        Target filename of Jupyter notebook. If not specified,
+                        it will use the filename of the Python script and
+                        append .ipynb
+  -o, --overwrite       Flag whether to overwrite existing target file.
+                        Defaults to false
 ```
 
 ## Requirements

@@ -56,6 +56,12 @@ Python's setup.py
 python setup.py install
 ```
 
+or
+
+```bash
+pip install git+https://github.com/remykarem/python2jupyter#egg=p2j
+```
+
 ## Converting
 
 There are 3 main ways you can get your Jupyter notebook:

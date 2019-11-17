@@ -44,8 +44,16 @@ Contents of this README:
 
 ## Installation
 
+PyPI
+
 ```bash
 pip install p2j
+```
+
+Python's setup.py
+
+```bash
+python setup.py install
 ```
 
 ## Converting

@@ -26,26 +26,11 @@ def p2j(source_filename, target_filename, overwrite):
     """
 
     # Check if source file exists and read
-    file_ext = os.path.splitext(source_filename)[-1]
-    if file_ext != ".py":
-        print("Wrong file type specified. Expected .ipynb extension " +
-              "but got {} instead.".format(file_ext))
-        sys.exit(1)
     try:
         with open(source_filename, 'r') as infile:
             data = [l.rstrip('\n') for l in infile]
     except FileNotFoundError:
         print("Source file not found. Specify a valid source file.")
-        sys.exit(1)
-
-    # Check if target file is specified and exists. If not specified, create
-    if target_filename is None:
-        target_filename = os.path.splitext(source_filename)[0] + ".ipynb"
-    if not overwrite and os.path.isfile(target_filename):
-        # FileExistsError
-        print("File {} exists. ".format(target_filename) +
-              "Add -o flag to overwrite this file, " +
-              "or specify a different target filename using -t.")
         sys.exit(1)
 
     # Read JSON files for .ipynb template
@@ -182,26 +167,11 @@ def j2p(source_filename, target_filename, overwrite):
     """
 
     # Check if source file exists and read
-    file_ext = os.path.splitext(source_filename)[-1]
-    if file_ext != ".ipynb":
-        print("Wrong file type specified. Expected .ipynb extension " +
-              "but got {} instead.".format(file_ext))
-        sys.exit(1)
     try:
         with open(source_filename, 'r') as infile:
             myfile = json.load(infile)
     except FileNotFoundError:
         print("Source file not found. Specify a valid source file.")
-        sys.exit(1)
-
-    # Check if target file is specified and exists. If not specified, create
-    if target_filename is None:
-        target_filename = os.path.splitext(source_filename)[0] + ".py"
-    if not overwrite and os.path.isfile(target_filename):
-        # FileExistsError
-        print("File {} exists. ".format(target_filename) +
-              "Add -o flag to overwrite this file, " +
-              "or specify a different target filename using -t.")
         sys.exit(1)
 
     final = [''.join(["# " + line.lstrip() for line in cell["source"] if not line.strip() == ""])
@@ -216,6 +186,7 @@ def j2p(source_filename, target_filename, overwrite):
 
 
 def main():
+    """Parse arguments and perform file checking"""
 
     # Get source and target filenames
     parser = argparse.ArgumentParser(
@@ -236,11 +207,44 @@ def main():
                         help='Flag whether to overwrite existing target file. Defaults to false')
     args = parser.parse_args()
 
+    file_ext = os.path.splitext(args.source_filename)[-1]
+
+
     if args.reverse:
+        if file_ext != ".ipynb":
+            print("Wrong file type specified. Expected .ipynb extension " +
+                  "but got {} instead.".format(file_ext))
+            sys.exit(1)
+
+        # Check if target file is specified and exists. If not specified, create
+        if args.target_filename is None:
+            target_filename = os.path.splitext(args.source_filename)[0] + ".py"
+        if not args.overwrite and os.path.isfile(args.target_filename):
+            # FileExistsError
+            print("File {} exists. ".format(target_filename) +
+                "Add -o flag to overwrite this file, " +
+                "or specify a different target filename using -t.")
+            sys.exit(1)
+
         j2p(source_filename=args.source_filename,
             target_filename=args.target_filename,
             overwrite=args.overwrite)
     else:
+        if file_ext != ".py":
+            print("Wrong file type specified. Expected .ipynb extension " +
+                  "but got {} instead.".format(file_ext))
+            sys.exit(1)
+
+        # Check if target file is specified and exists. If not specified, create
+        if args.target_filename is None:
+            target_filename = os.path.splitext(args.source_filename)[0] + ".ipynb"
+        if not args.overwrite and os.path.isfile(args.target_filename):
+            # FileExistsError
+            print("File {} exists. ".format(target_filename) +
+                "Add -o flag to overwrite this file, " +
+                "or specify a different target filename using -t.")
+            sys.exit(1)
+
         p2j(source_filename=args.source_filename,
             target_filename=args.target_filename,
             overwrite=args.overwrite)

@@ -34,13 +34,13 @@ The purpose of this package is to be able to run a code on Jupyter notebook with
 
 Contents of this README:
 
-- (Installing)(##Installation)
-- [Converting](##Converting)
-- [Tests](##Tests)
-- [Requirements](##Requirements)
-- [Code format](##Code-Format)
-- [How it works](##How-it-works)
-- [Feedback and pull requests](##Feedback-and-pull-requests)
+- (Installing)(##installation)
+- [Converting](##converting)
+- [Tests](##tests)
+- [Requirements](##requirements)
+- [Code format](##code-Format)
+- [How it works](##how-it-works)
+- [Feedback and pull requests](##feedback-and-pull-requests)
 
 ## Installation
 

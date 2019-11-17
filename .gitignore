@@ -4,3 +4,5 @@ build
 p2j.egg-info
 dist
 .pyc
+.vscode
+__pycache__

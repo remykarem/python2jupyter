@@ -26,8 +26,11 @@ def p2j(source_filename, target_filename, overwrite):
     """
 
     # Check if source file exists and read
-    if os.path.splitext(source_filename)[-1] != ".py":
-        raise FileTypeError
+    file_ext = os.path.splitext(source_filename)[-1]
+    if file_ext != ".py":
+        print("Wrong file type specified. Expected .ipynb extension " +
+              "but got {} instead.".format(file_ext))
+        sys.exit(1)
     try:
         with open(source_filename, 'r') as infile:
             data = [l.rstrip('\n') for l in infile]
@@ -39,8 +42,11 @@ def p2j(source_filename, target_filename, overwrite):
     if target_filename is None:
         target_filename = os.path.splitext(source_filename)[0] + ".ipynb"
     if not overwrite and os.path.isfile(target_filename):
-        raise FileExistsError("File {} exists. ".format(target_filename) +
-                              "Add -o flag to overwrite this file, or specify a different name.")
+        # FileExistsError
+        print("File {} exists. ".format(target_filename) +
+              "Add -o flag to overwrite this file, " +
+              "or specify a different target filename using -t.")
+        sys.exit(1)
 
     # Read JSON files for .ipynb template
     with open(HERE + '/templates/cell_code.json') as file:
@@ -176,8 +182,11 @@ def j2p(source_filename, target_filename, overwrite):
     """
 
     # Check if source file exists and read
-    if os.path.splitext(source_filename)[-1] != ".ipynb":
-        raise FileTypeError
+    file_ext = os.path.splitext(source_filename)[-1]
+    if file_ext != ".ipynb":
+        print("Wrong file type specified. Expected .ipynb extension " +
+              "but got {} instead.".format(file_ext))
+        sys.exit(1)
     try:
         with open(source_filename, 'r') as infile:
             myfile = json.load(infile)
@@ -189,10 +198,12 @@ def j2p(source_filename, target_filename, overwrite):
     if target_filename is None:
         target_filename = os.path.splitext(source_filename)[0] + ".py"
     if not overwrite and os.path.isfile(target_filename):
-        raise FileExistsError("File {} exists. ".format(target_filename) +
-                              "Add -o flag to overwrite this file, or specify a different name.")
+        # FileExistsError
+        print("File {} exists. ".format(target_filename) +
+              "Add -o flag to overwrite this file, " +
+              "or specify a different target filename using -t.")
+        sys.exit(1)
 
-    print('test')
     final = [''.join(["# " + line.lstrip() for line in cell["source"] if not line.strip() == ""])
              if cell["cell_type"] == "markdown" else ''.join(cell["source"])
              for cell in myfile['cells']]
@@ -208,7 +219,7 @@ def main():
 
     # Get source and target filenames
     parser = argparse.ArgumentParser(
-        description='Convert a Python script to Jupyter notebook')
+        description='Convert a Python script to Jupyter notebook and vice versa')
     parser.add_argument('source_filename',
                         help='Python script to parse')
     parser.add_argument('-r',
@@ -233,11 +244,6 @@ def main():
         p2j(source_filename=args.source_filename,
             target_filename=args.target_filename,
             overwrite=args.overwrite)
-
-
-class FileTypeError(Exception):
-    def __str__(self):
-        return "Wrong file type"
 
 
 if __name__ == "__main__":

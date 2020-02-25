@@ -32,7 +32,7 @@ The purpose of this package is to be able to run a code on Jupyter notebook with
 
 Contents of this README:
 
-- [Installing](#installation)
+- [Installation](#installation)
 - [Converting](#converting)
 - [Tests](#tests)
 - [Requirements](#requirements)

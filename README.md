@@ -2,7 +2,7 @@
 
 Convert your Python source code to Jupyter notebook with **zero intervention**.
 
-Here is an example.
+Here is an example of a `.py` file.
 
 ```python
 # Evaluate the model
@@ -28,8 +28,6 @@ which translates to the following:
 
 ![example](screenshot.png)
 
-Here's another example of a [Python source code](p2j/examples/example2.py) and its [Jupyter notebook](p2j/examples/example2.ipynb) after converting.
-
 The purpose of this package is to be able to run a code on Jupyter notebook without having to copy each paragraph of the code into every cell. It's also useful if we want to run our code in Google Colab. This parser isn't perfect, but you would be satisfactorily pleased with what you get.
 
 Contents of this README:
@@ -50,9 +48,10 @@ PyPI
 pip install p2j
 ```
 
-Python's setup.py
+Clone this repository and run Python's setup.py
 
 ```bash
+git clone 
 python setup.py install
 ```
 

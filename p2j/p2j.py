@@ -1,10 +1,10 @@
 """
 This module translates .py files to .ipynb and vice versa
 """
-import argparse
 import os
-import json
 import sys
+import json
+import argparse
 
 # Path to directory
 HERE = os.path.abspath(os.path.dirname(__file__))

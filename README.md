@@ -51,7 +51,7 @@ pip install p2j
 Clone this repository and run Python's setup.py
 
 ```bash
-git clone 
+git clone https://github.com/remykarem/python2jupyter.git
 python setup.py install
 ```
 
@@ -260,4 +260,4 @@ Now we handle the exceptions to the above-mentioned rules.
 
 ## Feedback and pull requests
 
-If you do like this, star me maybe? Pull requests are very much encouraged! Slide into my DM with suggestions too!
+If you do like this, star me maybe? Pull requests are very much encouraged!

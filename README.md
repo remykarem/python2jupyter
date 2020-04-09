@@ -146,7 +146,7 @@ There is no specific format that you should follow, but generally the parser ass
 
 ## How it works
 
-Jupyter notebooks are just JSON files, like below. A Python script is read line by line and a dictionary of key-value pairs are generated along the way, using a set of rules. Finally, this dictionary is dumped as a JSON file whose file extension is `.ipynb`.
+Jupyter notebooks are just JSON files, like below. A Python script is read line by line and a dictionary of key-value pairs is generated along the way, using a set of rules. Finally, this dictionary is dumped as a JSON file whose file extension is `.ipynb`.
 
 ```json
 {

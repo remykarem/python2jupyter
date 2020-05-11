@@ -256,6 +256,8 @@ Now we handle the exceptions to the above-mentioned rules.
 
 - Lines that begin with `#pylint` or `# pylint` are Pylint directives and are kept as **code cells**.
 
+- Lines that begin with `#FIXME`, `# FIXME`, `#TODO` or `# TODO` are kept as **code cells**.
+
 - Shebang is considered as a **code cell**, eg. `#!/usr/bin/env python3`.
 
 - Encodings like `# -*- coding: utf-8 -*-` are also considered as **code cells**.

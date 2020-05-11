@@ -68,10 +68,10 @@ def p2j(source_filename, target_filename, overwrite):
 
         # Labels for current line
         contains_triple_quotes = TRIPLE_QUOTES[0] in line or TRIPLE_QUOTES[1] in line
-        is_code = line.startswith("# pylint") or line.startswith(
-            "#pylint") or line.startswith("#!") or line.startswith(
-                "# -*- coding") or line.startswith("# coding=") or line.startswith(
-                    "# This Python file uses the following encoding:")
+        is_code = line.startswith("# pylint") or line.startswith("#pylint") or \
+            line.startswith("#!") or line.startswith("# -*- coding") or \
+            line.startswith("# coding=") or line.startswith("##") or \
+            line.startswith("# This Python file uses the following encoding:")
         is_end_of_code = i == num_lines-1
         starts_with_hash = line.startswith("#")
 
@@ -234,7 +234,7 @@ def main():
 
     # Get source and target filenames
     parser = argparse.ArgumentParser(
-        description="Convert a Python script to Jupyter notebook and vice versa", 
+        description="Convert a Python script to Jupyter notebook and vice versa",
         usage="p2j myfile.py")
     parser.add_argument('source_filename',
                         help='Python script to parse')

@@ -212,6 +212,8 @@ model.train(4)
 model.save()
 ```
 
+By default, a commented code will not be converted to Markdown if it is placed directly (no newline space) below a block of code. Elsewhere, it will get converted to Markdown. You should preprend the code with two hashes `##` (instead of one) to prevent it from being converted to Markdown.
+
 ### 3. Paragraph
 
 Thirdly, I assume that everyone writes his/her script in paragraphs, where each paragraph represents an idea. In a paragraph, there can be code or comments or both.

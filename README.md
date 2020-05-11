@@ -1,4 +1,5 @@
-# p2j - Python to Jupyter Notebook Parser [![PyPI version](https://badge.fury.io/py/p2j.svg)](https://badge.fury.io/py/p2j)
+# p2j - Python-to-Jupyter parser with zero intervention
+[![PyPI version](https://badge.fury.io/py/p2j.svg)](https://badge.fury.io/py/p2j)
 
 Convert your Python source code to Jupyter notebook with **zero intervention**.
 

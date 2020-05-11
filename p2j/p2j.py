@@ -71,6 +71,8 @@ def p2j(source_filename, target_filename, overwrite):
         is_code = line.startswith("# pylint") or line.startswith("#pylint") or \
             line.startswith("#!") or line.startswith("# -*- coding") or \
             line.startswith("# coding=") or line.startswith("##") or \
+            line.startswith("# FIXME") or line.startswith("#FIXME") or \
+            line.startswith("# TODO") or line.startswith("#TODO") or \
             line.startswith("# This Python file uses the following encoding:")
         is_end_of_code = i == num_lines-1
         starts_with_hash = line.startswith("#")

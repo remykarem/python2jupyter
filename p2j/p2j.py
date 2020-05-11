@@ -26,7 +26,7 @@ def p2j(source_filename, target_filename, overwrite):
 
     target_filename = _check_files(
         source_filename, target_filename, overwrite, conversion="p2j")
-
+    
     # Check if source file exists and read
     try:
         with open(source_filename, 'r') as infile:
@@ -104,7 +104,10 @@ def p2j(source_filename, target_filename, overwrite):
                 replace(TRIPLE_QUOTES[1], "\n")
 
             if not is_block_comment:
-                buffer = buffer[2:]
+                if len(buffer) > 1:
+                    buffer = buffer[2:] if buffer[1].isspace() else buffer[1:]
+                else:
+                    buffer = ""
 
             # Wrap this sub-paragraph as a markdown cell if
             # next line is end of code OR

@@ -3,7 +3,7 @@
 
 Convert your Python source code to Jupyter notebook with **zero intervention**.
 
-Here is an example of a `.py` file.
+Convert this source Python file:
 
 ```python
 # Evaluate the model
@@ -25,7 +25,7 @@ print(type(data))
 images = list(zip(mnist.images))
 ```
 
-which translates to the following:
+to the following Jupyter notebook:
 
 ![example](screenshot.png)
 

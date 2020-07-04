@@ -29,18 +29,18 @@ def p2j(source_filename, target_filename, overwrite):
     
     # Check if source file exists and read
     try:
-        with open(source_filename, 'r') as infile:
+        with open(source_filename, 'r', encoding='utf-8') as infile:
             data = [l.rstrip('\n') for l in infile]
     except FileNotFoundError:
         print("Source file not found. Specify a valid source file.")
         sys.exit(1)
 
     # Read JSON files for .ipynb template
-    with open(HERE + '/templates/cell_code.json') as file:
+    with open(HERE + '/templates/cell_code.json', encoding='utf-8') as file:
         CODE = json.load(file)
-    with open(HERE + '/templates/cell_markdown.json') as file:
+    with open(HERE + '/templates/cell_markdown.json', encoding='utf-8') as file:
         MARKDOWN = json.load(file)
-    with open(HERE + '/templates/metadata.json') as file:
+    with open(HERE + '/templates/metadata.json', encoding='utf-8') as file:
         MISC = json.load(file)
 
     # Initialise variables
@@ -158,8 +158,8 @@ def p2j(source_filename, target_filename, overwrite):
     final.update(MISC)
 
     # Write JSON to target file
-    with open(target_filename, 'w') as outfile:
-        json.dump(final, outfile)
+    with open(target_filename, 'w', encoding='utf-8') as outfile:
+        json.dump(final, outfile, indent=1, ensure_ascii=False)
         print("Notebook {} written.".format(target_filename))
 
 
@@ -217,7 +217,7 @@ def j2p(source_filename, target_filename, overwrite):
 
     # Check if source file exists and read
     try:
-        with open(source_filename, 'r') as infile:
+        with open(source_filename, 'r', encoding='utf-8') as infile:
             myfile = json.load(infile)
     except FileNotFoundError:
         print("Source file not found. Specify a valid source file.")
@@ -229,7 +229,7 @@ def j2p(source_filename, target_filename, overwrite):
     final = '\n\n'.join(final)
     final = final.replace("<br>", "")
 
-    with open(target_filename, "a") as outfile:
+    with open(target_filename, "a", encoding='utf-8') as outfile:
         outfile.write(final)
         print("Python script {} written.".format(target_filename))
 

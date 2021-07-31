@@ -1,10 +1,12 @@
 """
 This module translates .py files to .ipynb and vice versa
 """
+from typing import Optional
 import os
 import sys
 import json
-import argparse
+
+from p2j.utils import _check_files
 
 # Path to directory
 HERE = os.path.abspath(os.path.dirname(__file__))
@@ -15,7 +17,7 @@ EIGHT_SPACES = "{:<8}".format("")
 TWELVE_SPACES = "{:<12}".format("")
 
 
-def p2j(source_filename, target_filename, overwrite):
+def python2jupyter(source_filename: str, target_filename: str, overwrite: bool = False):
     """Convert Python scripts to Jupyter notebooks.
 
     Args:
@@ -26,21 +28,21 @@ def p2j(source_filename, target_filename, overwrite):
 
     target_filename = _check_files(
         source_filename, target_filename, overwrite, conversion="p2j")
-    
+
     # Check if source file exists and read
     try:
-        with open(source_filename, 'r', encoding='utf-8') as infile:
-            data = [l.rstrip('\n') for l in infile]
+        with open(source_filename, "r", encoding="utf-8") as infile:
+            data = [l.rstrip("\n") for l in infile]
     except FileNotFoundError:
         print("Source file not found. Specify a valid source file.")
         sys.exit(1)
 
     # Read JSON files for .ipynb template
-    with open(HERE + '/templates/cell_code.json', encoding='utf-8') as file:
+    with open(HERE + "/templates/cell_code.json", encoding="utf-8") as file:
         CODE = json.load(file)
-    with open(HERE + '/templates/cell_markdown.json', encoding='utf-8') as file:
+    with open(HERE + "/templates/cell_markdown.json", encoding="utf-8") as file:
         MARKDOWN = json.load(file)
-    with open(HERE + '/templates/metadata.json', encoding='utf-8') as file:
+    with open(HERE + "/templates/metadata.json", encoding="utf-8") as file:
         MISC = json.load(file)
 
     # Initialise variables
@@ -158,111 +160,6 @@ def p2j(source_filename, target_filename, overwrite):
     final.update(MISC)
 
     # Write JSON to target file
-    with open(target_filename, 'w', encoding='utf-8') as outfile:
+    with open(target_filename, "w", encoding="utf-8") as outfile:
         json.dump(final, outfile, indent=1, ensure_ascii=False)
         print("Notebook {} written.".format(target_filename))
-
-
-def _check_files(source_file, target_file, overwrite, conversion):
-    """File path checking
-
-    Check if
-    1) Name of source file is valid.
-    2) Target file already exists. If not, create.
-
-    Does not check if source file exists. That will be done
-    together when opening the file.
-    """
-
-    if conversion == "p2j":
-        expected_src_file_ext = ".py"
-        expected_tgt_file_ext = ".ipynb"
-    else:
-        expected_src_file_ext = ".ipynb"
-        expected_tgt_file_ext = ".py"
-
-    file_base = os.path.splitext(source_file)[0]
-    file_ext = os.path.splitext(source_file)[-1]
-
-    if file_ext != expected_src_file_ext:
-        print("Wrong file type specified. Expected {} ".format(expected_src_file_ext) +
-              "extension but got {} instead.".format(file_ext))
-        sys.exit(1)
-
-    # Check if target file is specified and exists. If not specified, create
-    if target_file is None:
-        target_file = file_base + expected_tgt_file_ext
-    if not overwrite and os.path.isfile(target_file):
-        # FileExistsError
-        print("File {} exists. ".format(target_file) +
-              "Add -o flag to overwrite this file, " +
-              "or specify a different target filename using -t.")
-        sys.exit(1)
-
-    return target_file
-
-
-def j2p(source_filename, target_filename, overwrite):
-    """Convert Jupyter notebooks to Python scripts
-
-    Args:
-        source_filename (str): Path to Jupyter notebook.
-        target_filename (str): Path to name of Python script. Optional.
-        overwrite (bool): Whether to overwrite an existing Python script.
-        with_markdown (bool, optional): Whether to include markdown. Defaults to False.
-    """
-
-    target_filename = _check_files(
-        source_filename, target_filename, overwrite, conversion="j2p")
-
-    # Check if source file exists and read
-    try:
-        with open(source_filename, 'r', encoding='utf-8') as infile:
-            myfile = json.load(infile)
-    except FileNotFoundError:
-        print("Source file not found. Specify a valid source file.")
-        sys.exit(1)
-
-    final = [''.join(["# " + line.lstrip() for line in cell["source"] if not line.strip() == ""])
-             if cell["cell_type"] == "markdown" else ''.join(cell["source"])
-             for cell in myfile['cells']]
-    final = '\n\n'.join(final)
-    final = final.replace("<br>", "")
-
-    with open(target_filename, "a", encoding='utf-8') as outfile:
-        outfile.write(final)
-        print("Python script {} written.".format(target_filename))
-
-
-def main():
-    """Parse arguments and perform file checking"""
-
-    # Get source and target filenames
-    parser = argparse.ArgumentParser(
-        description="Convert a Python script to Jupyter notebook and vice versa",
-        usage="p2j myfile.py")
-    parser.add_argument('source_filename',
-                        help='Python script to parse')
-    parser.add_argument('-r', '--reverse',
-                        action='store_true',
-                        help="To convert Jupyter to Python scripto")
-    parser.add_argument('-t', '--target_filename',
-                        help="Target filename of Jupyter notebook. If not specified, " +
-                        "it will use the filename of the Python script and append .ipynb")
-    parser.add_argument('-o', '--overwrite',
-                        action='store_true',
-                        help='Flag whether to overwrite existing target file. Defaults to false')
-    args = parser.parse_args()
-
-    if args.reverse:
-        j2p(source_filename=args.source_filename,
-            target_filename=args.target_filename,
-            overwrite=args.overwrite)
-    else:
-        p2j(source_filename=args.source_filename,
-            target_filename=args.target_filename,
-            overwrite=args.overwrite)
-
-
-if __name__ == "__main__":
-    main()

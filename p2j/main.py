@@ -22,11 +22,11 @@ def main():
     args = parser.parse_args()
 
     if args.reverse:
-        python2jupyter(source_filename=args.source_filename,
+        jupyter2python(source_filename=args.source_filename,
                        target_filename=args.target_filename,
                        overwrite=args.overwrite)
     else:
-        jupyter2python(source_filename=args.source_filename,
+        python2jupyter(source_filename=args.source_filename,
                        target_filename=args.target_filename,
                        overwrite=args.overwrite)
 

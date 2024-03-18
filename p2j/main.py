@@ -19,6 +19,11 @@ def main():
     parser.add_argument("-o", "--overwrite",
                         action="store_true",
                         help="Flag whether to overwrite existing target file.")
+    parser.add_argument("-e",
+                        "--encoding",
+                        default="utf-8",
+                        type=str,
+                        help="Encodes obj using the codec registered for encoding.")               
     args = parser.parse_args()
 
     if args.reverse:

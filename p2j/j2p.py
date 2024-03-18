@@ -3,7 +3,7 @@ import json
 from p2j.utils import _check_files
 
 
-def jupyter2python(source_filename: str, target_filename: str, overwrite: bool = False):
+def jupyter2python(source_filename: str, target_filename: str, overwrite: bool = False, encoding: str = "utf-8"):
     """Convert Jupyter notebooks to Python scripts
 
     Args:
@@ -11,6 +11,7 @@ def jupyter2python(source_filename: str, target_filename: str, overwrite: bool =
         target_filename (str): Path to name of Python script. Optional.
         overwrite (bool): Whether to overwrite an existing Python script.
         with_markdown (bool, optional): Whether to include markdown. Defaults to False.
+        encoding (str): Encodes obj using the codec registered for encoding.
     """
 
     target_filename = _check_files(
@@ -18,7 +19,7 @@ def jupyter2python(source_filename: str, target_filename: str, overwrite: bool =
 
     # Check if source file exists and read
     try:
-        with open(source_filename, "r", encoding="utf-8") as infile:
+        with open(source_filename, "r", encoding=encoding) as infile:
             myfile = json.load(infile)
     except FileNotFoundError:
         print("Source file not found. Specify a valid source file.")
@@ -30,6 +31,6 @@ def jupyter2python(source_filename: str, target_filename: str, overwrite: bool =
     final = "\n\n".join(final)
     final = final.replace("<br>", "")
 
-    with open(target_filename, "a", encoding="utf-8") as outfile:
+    with open(target_filename, "a", encoding=encoding) as outfile:
         outfile.write(final)
         print("Python script {} written.".format(target_filename))

@@ -17,13 +17,14 @@ EIGHT_SPACES = "{:<8}".format("")
 TWELVE_SPACES = "{:<12}".format("")
 
 
-def python2jupyter(source_filename: str, target_filename: str, overwrite: bool = False):
+def python2jupyter(source_filename: str, target_filename: str, overwrite: bool = False, encoding: str = "utf-8"):
     """Convert Python scripts to Jupyter notebooks.
 
     Args:
         source_filename (str): Path to Python script.
         target_filename (str): Path to name of Jupyter notebook. Optional.
         overwrite (bool): Whether to overwrite an existing Jupyter notebook.
+        encoding (str): Encodes obj using the codec registered for encoding.
     """
 
     target_filename = _check_files(
@@ -31,18 +32,18 @@ def python2jupyter(source_filename: str, target_filename: str, overwrite: bool =
 
     # Check if source file exists and read
     try:
-        with open(source_filename, "r", encoding="utf-8") as infile:
+        with open(source_filename, "r", encoding=encoding) as infile:
             data = [l.rstrip("\n") for l in infile]
     except FileNotFoundError:
         print("Source file not found. Specify a valid source file.")
         sys.exit(1)
 
     # Read JSON files for .ipynb template
-    with open(HERE + "/templates/cell_code.json", encoding="utf-8") as file:
+    with open(HERE + "/templates/cell_code.json", encoding=encoding) as file:
         CODE = json.load(file)
-    with open(HERE + "/templates/cell_markdown.json", encoding="utf-8") as file:
+    with open(HERE + "/templates/cell_markdown.json", encoding=encoding) as file:
         MARKDOWN = json.load(file)
-    with open(HERE + "/templates/metadata.json", encoding="utf-8") as file:
+    with open(HERE + "/templates/metadata.json", encoding=encoding) as file:
         MISC = json.load(file)
 
     # Initialise variables
@@ -160,6 +161,6 @@ def python2jupyter(source_filename: str, target_filename: str, overwrite: bool =
     final.update(MISC)
 
     # Write JSON to target file
-    with open(target_filename, "w", encoding="utf-8") as outfile:
+    with open(target_filename, "w", encoding=encoding) as outfile:
         json.dump(final, outfile, indent=1, ensure_ascii=False)
         print("Notebook {} written.".format(target_filename))
